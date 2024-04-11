@@ -1,8 +1,131 @@
 <!DOCTYPE html>
 <html>
-<link rel="icon" href="logo.png" type="image/png">
+<head>
+	<link rel="icon" href="logo.png" type="image/png">
+    <title>REMCO105</title>
+    <style>
+        /* Style for the menu */
+        .menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .menu li {
+            display: inline;
+            margin-right: 10px;
+        }
+        .menu li a {
+            text-decoration: none;
+            color: blue;
+        }
+        .menu li a:hover {
+            color: red;
+        }
+        /* Style for the summaries */
+        .summary {
+            display: none;
+        }
+    </style>
+</head>
+
 <body>
-<h1>REMCO105</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <h1>REMCO105</h1>
+    <p>I'm hosted with GitHub Pages.</p>
+
+    <!-- Form for adding names -->
+    <form id="nameForm">
+        <input type="text" id="newName" placeholder="Enter a new name">
+        <button type="button" onclick="addName()">Add Name</button>
+    </form>
+
+    <ul class="menu" id="menuList">
+        <!-- Menu items will be added dynamically here -->
+    </ul>
+
+    <!-- Summaries will be added dynamically here -->
+
+    <!-- Form for adding or editing summary -->
+    <div id="summaryForm" style="display:none;">
+        <h2 id="summaryTitle"></h2>
+        <textarea id="summaryInput" rows="4" cols="50" placeholder="Enter a summary"></textarea><br>
+        <button type="button" onclick="saveSummary()">Save Summary</button>
+        <button type="button" onclick="cancelSummary()">Cancel</button>
+    </div>
+
+    <script>
+        // Load saved names and summaries from localStorage
+        window.onload = function() {
+            loadSavedNames();
+        };
+
+        // Function to load saved names and summaries from localStorage
+        function loadSavedNames() {
+            var savedNames = Object.keys(localStorage);
+            for (var i = 0; i < savedNames.length; i++) {
+                if (!savedNames[i].endsWith("_summary")) {
+                    addNameToList(savedNames[i]);
+                    var summary = localStorage.getItem(savedNames[i] + "_summary");
+                    document.getElementById(savedNames[i] + "_summary").innerHTML = "<h2>" + savedNames[i] + " Summary</h2><p>" + summary + "</p>";
+                }
+            }
+        }
+
+        // Function to add a new name to the menu
+        function addName() {
+            var newName = document.getElementById("newName").value;
+            if (newName.trim() !== "") {
+                addNameToList(newName);
+                // Save empty summary for the new name
+                localStorage.setItem(newName + "_summary", "");
+                // Clear the input field
+                document.getElementById("newName").value = "";
+                // Add a corresponding summary div
+                var summaryDiv = document.createElement("div");
+                summaryDiv.id = newName + "_summary";
+                summaryDiv.className = "summary";
+                document.body.appendChild(summaryDiv);
+            }
+        }
+
+        // Function to add a new name to the menu list
+        function addNameToList(name) {
+            var menuList = document.getElementById("menuList");
+            var listItem = document.createElement("li");
+            var link = document.createElement("a");
+            link.href = "#";
+            link.textContent = name;
+            link.onclick = function() {
+                showSummary(name);
+            };
+            listItem.appendChild(link);
+            menuList.appendChild(listItem);
+        }
+
+        // Function to show the summary form for a given name
+        function showSummary(name) {
+            document.getElementById("summaryTitle").textContent = name + " Summary";
+            document.getElementById("summaryInput").value = getSummary(name);
+            document.getElementById("summaryForm").style.display = "block";
+        }
+
+        // Function to get the summary for a given name from localStorage
+        function getSummary(name) {
+            return localStorage.getItem(name + "_summary") || "";
+        }
+
+        // Function to save the summary for the current name to localStorage
+        function saveSummary() {
+            var name = document.getElementById("summaryTitle").textContent.replace(" Summary", "");
+            var summary = document.getElementById("summaryInput").value;
+            localStorage.setItem(name + "_summary", summary);
+            document.getElementById(name + "_summary").innerHTML = "<h2>" + name + " Summary</h2><p>" + summary + "</p>";
+            cancelSummary();
+        }
+
+        // Function to cancel editing the summary
+        function cancelSummary() {
+            document.getElementById("summaryForm").style.display = "none";
+        }
+    </script>
 </body>
 </html>
